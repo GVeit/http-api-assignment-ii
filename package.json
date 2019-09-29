@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./src/server.js",
     "pretest": "eslint ./src --fix",
-    "test": "It works"
+    "test": "echo \"It works\""
   },
   "repository": {
     "type": "git",
