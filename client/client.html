@@ -31,13 +31,14 @@
     //function to handle our response
     const handleResponse = (xhr) => {
       const content = document.querySelector('#content');
-        
+      content.innerHTML = '';
       if(xhr.getResponseHeader('Content-Type') === 'application/json'){
         //parse response 
         parseJSON(xhr, content);
       } else {
         console.dir(xhr.responseXML);
         //check the status code
+          
           switch(xhr.status) {
             case 200: //success
               content.innerHTML = `<b>Success</b>`;
@@ -150,7 +151,7 @@
             console.log(urlField);
             //sendAjax(e, userForm, methodSelect);
             sendAjax(e, urlField, methodSelect);
-            $('#content').val("");
+            
         }
 
         //create handler
