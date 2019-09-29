@@ -31,31 +31,44 @@
     //function to handle our response
     const handleResponse = (xhr) => {
       const content = document.querySelector('#content');
-      
-      //check the status code
-      switch(xhr.status) {
-        case 200: //success
-          content.innerHTML = `<b>Success</b>`;
-          break;
-        case 201: //created
-          content.innerHTML = '<b>Create</b>';
-          break;
-        case 204: //updated (no response back from server)
-          content.innerHTML = '<b>Updated (No Content)</b>';
-          return;
-        case 400: //bad request
-          content.innerHTML = `<b>Bad Request</b>`;
-          break;
-        default: //any other status code
-          content.innerHTML = `Error code not implemented by client.`;
-          break;
+        
+      if(xhr.getResponseHeader('Content-Type') === 'application/json'){
+        //parse response 
+        parseJSON(xhr, content);
+      } else {
+        console.dir(xhr.responseXML);
+        //check the status code
+          switch(xhr.status) {
+            case 200: //success
+              content.innerHTML = `<b>Success</b>`;
+              break;
+            case 201: //created
+              content.innerHTML = '<b>Create</b>';
+              break;
+            case 204: //updated (no response back from server)
+              content.innerHTML = '<b>Updated (No Content)</b>';
+              return;
+            case 400: //bad request
+              content.innerHTML = `<b>Bad Request</b>`;
+              break;
+            case 401: // missing the query parameter
+              content.innerHTML = `<b>Missing the Query Parameter</b>`;
+              break;
+            case 403: // Forbidden
+              content.innerHTML = `<b>Forbidden</b>`;
+              break;
+            case 404: //not found (requested resource does not exist)
+              content.innerHTML = `<b>Resource Not Found</b>`;
+              break;
+            default: //any other status code
+              content.innerHTML = `Error code not implemented by client.`;
+              break;
+          }
       }
-
-      //parse response 
-      parseJSON(xhr, content);
     };
 
     //function to send our post request
+    //function to send our post reques
     const sendPost = (e, nameForm) => {
       //grab the forms action (url to go to)
       //and method (HTTP method - POST in this case)
@@ -104,52 +117,52 @@
     //function to send ajax
     const sendAjax = (e, url, type) => {
         
-        const typeSelector = document.querySelector('#type').value;
-        console.log(typeSelector);
-        
-      //create a new xhr (ajax) request. 
-      //Remember that these are ASYNCHRONOUS
-      const xhr = new XMLHttpRequest();
-      //set the xhr to a GET request to a certain URL
-      xhr.open(type, url);
-      //Set the accept headers to the desired response mime type
-      //Server does NOT have to support this. It is a gentle request.
-      xhr.setRequestHeader ("Accept", typeSelector);
+        //const typeSelector = document.querySelector('#type').value;
+        //console.log(typeSelector);
 
-      //When the xhr loads, call handleResponse and pass the xhr object
-      xhr.onload = () => handleResponse(xhr);
+        //create a new xhr (ajax) request. 
+        //Remember that these are ASYNCHRONOUS
+        const xhr = new XMLHttpRequest();
+        //set the xhr to a GET request to a certain URL
+        xhr.open(type, url);
+        //Set the accept headers to the desired response mime type
+        //Server does NOT have to support this. It is a gentle request.
+        xhr.setRequestHeader ("Accept", "application/json");
 
-      //send our ajax request to the server
-      xhr.send();
-        
+        //When the xhr loads, call handleResponse and pass the xhr object
+        xhr.onload = () => handleResponse(xhr);
+
+        //send our ajax request to the server
+        xhr.send();
+
         e.preventDefault();
         return false;
     };
 
     const init = () => {
-      //grab form
-      const nameForm = document.querySelector('#nameForm');
+        //grab form
+        const nameForm = document.querySelector('#nameForm');
         const userForm = document.querySelector('#userForm');
-    
-    
-        
+
         const request = (e) => {
-            
             const urlField = document.querySelector('#urlField').value;
-             const methodSelect = document.querySelector('#methodSelect').value;
-            
-            sendAjax(e, userForm, methodSelect);
+            const methodSelect = document.querySelector('#methodSelect').value;
+            console.log(urlField);
+            //sendAjax(e, userForm, methodSelect);
+            sendAjax(e, urlField, methodSelect);
+            $('#content').val("");
         }
-      
-      //create handler
-      const addUser = (e) => {
-          sendPost(e, nameForm);
-      }
-      
-      //attach submit event (for clicking submit or hitting enter)
-      nameForm.addEventListener('submit', addUser);
-        userForm.addEventListener('submit', request);
+
+        //create handler
+        const addUser = (e) => {
+            sendPost(e, nameForm);
+        }
+          //attach submit event (for clicking submit or hitting enter)
+          nameForm.addEventListener('submit', addUser);
+          userForm.addEventListener('submit', request);
     };
+
+    window.onload = init;
 
   </script>
 </head>
